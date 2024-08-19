@@ -1,0 +1,47 @@
+df = pd.read_csv("/kaggle/input/heart-attack-analysis-prediction-dataset/heart.csv")
+df.head()
+df.describe()
+df.isnull().sum()
+for i in list(df.columns):
+    print("{} -- {}".format(i, df[i].value_counts().shape[0]))
+categorical_list = ["sex", "cp","fbs","restecg","exng","slp","caa","thall","output"]
+df_categoric = df.loc[:, categorical_list]
+for i in categorical_list:
+    plt.figure()
+    sns.countplot(x = i, data = df_categoric, hue = "output")
+    plt.title(i)
+numeric_list = ["age", "trtbps","chol","thalachh","oldpeak","output"]
+df_numeric = df.loc[:, numeric_list]
+sns.pairplot(df_numeric, hue = "output", diag_kind = "kde")
+plt.show()
+
+# outlier detection
+for i in numeric_list:
+    
+    # IQR
+    Q1 = np.percentile(df.loc[:, i],25)
+    Q3 = np.percentile(df.loc[:, i],75)
+    
+    IQR = Q3 - Q1
+    
+    print("Old shape: ", df.loc[:, i].shape)
+    
+    # upper bound
+    upper = np.where(df.loc[:, i] >= (Q3 +2.5*IQR))
+    
+    # lower bound
+    lower = np.where(df.loc[:, i] <= (Q1 - 2.5*IQR))
+    
+    print("{} -- {}".format(upper, lower))
+    try:
+        df.drop(upper[0], inplace = True)
+    except: print("KeyError: {} not found in axis".format(upper[0]))
+    
+    try:
+        df.drop(lower[0], inplace = True)
+    except:  print("KeyError: {} not found in axis".format(lower[0]))
+        
+    print("New shape: ", df.shape)
+
+
+
