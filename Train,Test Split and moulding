@@ -1,0 +1,40 @@
+#Modelling
+df1 = df.copy()
+df1 = pd.get_dummies(df1, columns = categorical_list[:-1], drop_first = True)
+df1.head()
+X = df1.drop(["output"], axis = 1)
+y = df1[["output"]]
+#Scaling
+scaler = StandardScaler()
+scaler
+X[numeric_list[:-1]] = scaler.fit_transform(X[numeric_list[:-1]])
+X.head()
+#Train/Test Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.1, random_state = 3)
+print("X_train: {}".format(X_train.shape))
+print("X_test: {}".format(X_test.shape))
+print("y_train: {}".format(y_train.shape))
+print("y_test: {}".format(y_test.shape))
+#Logistic Regression
+logreg = LogisticRegression()
+logreg
+# fitting = training
+logreg.fit(X_train, y_train)
+# calculate probabilities
+y_pred_prob = logreg.predict_proba(X_test)
+y_pred_prob
+print("Test accuracy: {}".format(accuracy_score(y_pred, y_test)))
+#Logistic Regression Hyperparameter Tuning
+lr = LogisticRegression()
+lr
+penalty = ["l1", "l2"]
+parameters = {"penalty":penalty}
+lr_searcher = GridSearchCV(lr, parameters)
+lr_searcher.fit(X_train, y_train)
+print("Best parameters: ",lr_searcher.best_params_)
+y_pred = lr_searcher.predict(X_test)
+print("Test accuracy: {}".format(accuracy_score(y_pred, y_test)))
+
+
+
+
